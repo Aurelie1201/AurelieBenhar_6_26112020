@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 
+const userRoutes = require('./routes/user');
+
 mongoose.connect('mongodb+srv://Jo:MotDePasse1@cluster0.ahins.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -17,8 +19,6 @@ app.use((req, res, next) =>{
 
 app.use(express.json());//Remplace bodyParser.json()
 
-app.use((req, res, next) =>{
-    res.json({message : 'votre requête a bien été reçue'});
-});
+app.use('/api/auth', userRoutes);
 
 module.exports = app;
