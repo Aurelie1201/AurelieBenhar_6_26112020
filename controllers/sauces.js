@@ -5,11 +5,7 @@ exports.createSauce = (req, res, next) =>{
 
     const sauce = new Sauce({
         ...sauceObjet,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-        likes: 0,
-        dislikes: 0,
-        usersLiked: [],
-        usersDisliked:[]
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
 
     sauce.save()
