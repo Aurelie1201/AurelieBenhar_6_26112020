@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const app = express();
 
 const userRoutes = require('./routes/user');
+const sauceRoutes = require('./routes/sauces');
 
 mongoose.connect('mongodb+srv://Jo:MotDePasse1@cluster0.ahins.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
   { useNewUrlParser: true,
@@ -20,5 +21,6 @@ app.use((req, res, next) =>{
 app.use(express.json());//Remplace bodyParser.json()
 
 app.use('/api/auth', userRoutes);
+app.use('/api/sauces', sauceRoutes);
 
 module.exports = app;

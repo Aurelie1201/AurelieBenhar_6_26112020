@@ -3,4 +3,6 @@ const router = express.Router();
 
 const sauceControl = require('../controllers/sauces');
 
-routeur.post('/', sauceControl.createSauce);
+router.post('/', sauceControl.createSauce);
+
+module.exports = router;
