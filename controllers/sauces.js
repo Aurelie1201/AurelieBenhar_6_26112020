@@ -58,3 +58,31 @@ exports.deleteSauce = (req, res) =>{
         })
         .catch(error => res.status(500).json({error}));
 }
+
+/**
+ * Modifie la sauce d'id passé dans la requête
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.modifySauce = (req, res) =>{
+    let sauceObjet = {};
+    if (req.file) {
+        Sauce.findOne({_id: req.params.id})
+            .then(sauce =>{
+                const filename = sauce.imageUrl.split('/images/')[1];
+                fileSystem.unlink(`images/${filename}`, ()=>{
+                    console.log(req.file.filename);
+                });
+            })
+            .catch(error => res.status(500).json({error}));
+        sauceObjet = {
+            ...JSON.parse(req.body.sauce), 
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        };
+    } else{
+        sauceObjet = {...req.body};
+    }
+    Sauce.updateOne({_id: req.params.id}, { ...sauceObjet, _id: req.params.id})
+        .then(() => res.status(200).json({message: 'Sauce modifiée'}))
+        .catch(error => res.status(400).json({error}));
+}
