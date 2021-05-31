@@ -93,8 +93,6 @@ exports.likeSauce = (req, res) =>{
         .then(sauce =>{
             const like = req.body.like;
             const userId = req.body.userId;
-            let newUsersLiked = [];
-            let newLikes = 0;
             let sauceUpdate = {};
             switch (like){
                 case 1 : {
@@ -102,18 +100,19 @@ exports.likeSauce = (req, res) =>{
                         alerte('Vous aimez déjà cette sauce');
                     } else{
                         console.log('coucou');
-                        sauce.usersLiked.push(userId);
-                        newUsersLiked = [sauce.usersLiked];
-                        newLikes = sauce.likes +1;
-                        sauceUpdate = {usersLiked: newUsersLiked, likes: newLikes};
+                        sauceUpdate = this.choiceLike(sauce, userId);
                         Sauce.updateOne({_id: req.params.id}, { ...sauceUpdate, _id: req.params.id})
                             .then(() => res.status(200).json({message: 'like ajouté'}))
                             .catch(error => res.status(400).json({error}));
                         };
-                    };
-                    break;
+                };
+                break;
                 case 0 : {
                     console.log('Demande d annulation');
+                };
+                break;
+                case -1 : {
+                    console.log('n aime pas la sauce');
                 }
             };
             console.log('tableau des jaime de la sauce : ' +sauce.usersLiked);
@@ -121,4 +120,18 @@ exports.likeSauce = (req, res) =>{
             console.log('userId : ' + req.body.userId);
         })
         .catch(error => res.status(500).json({error}));
+};
+/**
+ * 
+ * @param {object} sauce 
+ * @param {string} userId 
+ * @returns 
+ */
+exports.choiceLike = (sauce, userId) => {
+    console.log('fonction');
+    sauce.usersLiked.push(userId);
+    const newUsersLiked = sauce.usersLiked;
+    const newLikes = sauce.likes +1;
+    const sauceUpdate = {usersLiked: newUsersLiked, likes: newLikes};
+    return sauceUpdate;
 };
