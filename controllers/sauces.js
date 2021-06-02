@@ -38,7 +38,8 @@ exports.getAllSauce = (req, res) =>{
  */
 exports.getOneSauce = (req, res) =>{
     Sauce.findOne({_id: req.params.id})
-        .then(sauce => res.status(200).json(sauce))
+        .then(sauce => {res.status(200).json(sauce);
+        console.log(sauce.usersLiked);})
         .catch(error => res.status(404).json({error}));
 };
 
@@ -97,23 +98,39 @@ exports.likeSauce = (req, res) =>{
             switch (like){
                 case 1 : {
                     if (sauce.usersLiked.includes(userId) || sauce.usersDisliked.includes(userId)){
-                        alerte('Vous aimez déjà cette sauce');
+                        alerte('Vous avez déjà effectué un choix pour cette sauce');
+                        res.status(400).json({message: 'utilisateur ayant déjà fait un choix de préférence pour cette sauce'});
                     } else{
                         console.log('coucou');
                         sauceUpdate = this.choiceLike(sauce, userId);
                         Sauce.updateOne({_id: req.params.id}, { ...sauceUpdate, _id: req.params.id})
-                            .then(() => res.status(200).json({message: 'like ajouté'}))
+                            .then(() => res.status(201).json({message: 'like ajouté'}))
                             .catch(error => res.status(400).json({error}));
                         };
                 };
                 break;
                 case 0 : {
                     console.log('Demande d annulation');
-                };
+                    sauceUpdate = this.changeChoice(sauce, userId);
+                    console.log(sauceUpdate);
+                    Sauce.updateOne({_id: req.params.id}, {...sauceUpdate, _id: req.params.id})
+                        .then(() => res.status(201).json({message: 'Choix annulé'}))
+                        .catch(error => res.status(400).json({error}));
+                    };
                 break;
                 case -1 : {
-                    console.log('n aime pas la sauce');
-                }
+                    if (sauce.usersLiked.includes(userId) || sauce.usersDisliked.includes(userId)){
+                        alerte('Vous avez déjà effectué un choix pour cette sauce');
+                        res.status(400).json({message: 'utilisateur ayant déjà fait un choix de préférence pour cette sauce'});
+                    } else{
+                        console.log('coucou');
+                        sauceUpdate = this.choiceDislike(sauce, userId);
+                        Sauce.updateOne({_id: req.params.id}, { ...sauceUpdate, _id: req.params.id})
+                            .then(() => res.status(201).json({message: 'dislike ajouté'}))
+                            .catch(error => res.status(400).json({error}));
+                        };
+                };
+                break;
             };
             console.log('tableau des jaime de la sauce : ' +sauce.usersLiked);
             console.log('les jaime de la sauce : ' + sauce.likes);
@@ -127,11 +144,51 @@ exports.likeSauce = (req, res) =>{
  * @param {string} userId 
  * @returns 
  */
-exports.choiceLike = (sauce, userId) => {
+exports.choiceLike = (sauce, userId) =>{
     console.log('fonction');
     sauce.usersLiked.push(userId);
     const newUsersLiked = sauce.usersLiked;
     const newLikes = sauce.likes +1;
     const sauceUpdate = {usersLiked: newUsersLiked, likes: newLikes};
+    return sauceUpdate;
+};
+
+/**
+ * 
+ * @param {object} sauce 
+ * @param {string} userId 
+ * @returns 
+ */
+exports.changeChoice = (sauce, userId) =>{
+    let sauceUpdate = {};
+    if(sauce.usersLiked.includes(userId)){
+        const index = sauce.usersLiked.indexOf(userId);
+        sauce.usersLiked.splice(index, 1);
+        const newUsersLiked = sauce.usersLiked;
+        const newLikes = sauce.likes - 1;
+        sauceUpdate = {usersLiked: newUsersLiked, likes: newLikes};
+    };
+    if(sauce.usersDisliked.includes(userId)){
+        const index = sauce.usersDisliked.indexOf(userId);
+        sauce.usersDisliked.splice(index, 1);
+        const newUsersDisliked = sauce.usersDisliked;
+        const newDislikes = sauce.dislikes - 1;
+        sauceUpdate = {usersDisliked: newUsersDisliked, dislikes: newDislikes};
+    };
+    return sauceUpdate;
+};
+
+/**
+ * 
+ * @param {object} sauce 
+ * @param {string} userId 
+ * @returns 
+ */
+exports.choiceDislike = (sauce, userId) =>{
+    console.log('fonction');
+    sauce.usersDisliked.push(userId);
+    const newUsersDisliked = sauce.usersDisliked;
+    const newDislikes = sauce.dislikes +1;
+    const sauceUpdate = {usersDisliked: newUsersDisliked, dislikes: newDislikes};
     return sauceUpdate;
 };
