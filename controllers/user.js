@@ -1,11 +1,16 @@
 const bcrypt = require('bcrypt');
 const jsonWebToken = require('jsonwebtoken');
 const User = require('../models/User');
+const CryptoJs = require('crypto-js');
+const key = CryptoJs.enc.Hex.parse(process.env.CRYPTO_KEY);
+const iv = CryptoJs.enc.Hex.parse(process.env.CRYPTO_IV);
+
 exports.signup = (req, res) =>{
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
+            const cryptMail = CryptoJs.AES.encrypt(req.body.email, key, {iv: iv}).toString();
             const user = new User({
-                email: req.body.email,
+                email: cryptMail,
                 password: hash
             });
             user.save()
@@ -17,7 +22,9 @@ exports.signup = (req, res) =>{
 };
 
 exports.login = (req, res) =>{
-    User.findOne({email: req.body.email})
+    const cryptMail = CryptoJs.AES.encrypt(req.body.email, key, {iv: iv}).toString();
+    console.log(cryptMail);
+    User.findOne({email: cryptMail})
         .then(user =>{
             if (!user){
                 return res.status(401).json({error: 'Utilisateur inexistant'});
