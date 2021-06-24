@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const app = express();
 const path = require('path');
 const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
 const rateLimit = require("express-rate-limit");
 require('dotenv').config();
 
@@ -25,7 +26,8 @@ app.use((req, res, next) =>{
 
 app.use(express.json());//Remplace bodyParser.json()
 
-app.use(helmet());
+app.use(helmet()); //Sécurise les en-têtes HTTP
+app.use(mongoSanitize()); //Désinfecte les données pour éviter les attaques par injection noSQL
 app.use(limiter); //La limite des 100 requêtes est appliquée à toutes les routes
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
