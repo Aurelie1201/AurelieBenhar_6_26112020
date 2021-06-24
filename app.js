@@ -2,10 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const path = require('path');
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 require('dotenv').config();
 
 const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauces');
+const limiter = rateLimit({windowMs: 10*60*1000, max: 100}); //Le client pourra effectuer 100 requêtes toutes les 10 min
 
 mongoose.connect('mongodb+srv://'+process.env.DB_USER+':'+process.env.DB_PASSWORD+'@cluster0.ahins.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
   { useNewUrlParser: true,
@@ -21,6 +24,9 @@ app.use((req, res, next) =>{
 });
 
 app.use(express.json());//Remplace bodyParser.json()
+
+app.use(helmet());
+app.use(limiter); //La limite des 100 requêtes est appliquée à toutes les routes
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
