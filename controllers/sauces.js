@@ -1,14 +1,13 @@
 const Sauce = require('../models/Sauce');
 const fileSystem = require('fs');
-const { allowedNodeEnvironmentFlags } = require('process');
+// const { allowedNodeEnvironmentFlags } = require('process');
 
 /**
  * Création d'une sauce
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * @param {Object} req 
+ * @param {Object} res
  */
-exports.createSauce = (req, res, next) =>{
+exports.createSauce = (req, res) =>{
     const sauceObjet = JSON.parse(req.body.sauce);
     const sauce = new Sauce({
         ...sauceObjet,
@@ -23,7 +22,7 @@ exports.createSauce = (req, res, next) =>{
 /**
  * Renvoi un tableau contenant toutes les sauces
  * @param {*} req 
- * @param {*} res 
+ * @param {Array} res 
  */
 exports.getAllSauce = (req, res) =>{
     Sauce.find()
@@ -34,7 +33,7 @@ exports.getAllSauce = (req, res) =>{
 /**
  * Récupère la sauce d'id donné dans la requête
  * @param {*} req 
- * @param {*} res 
+ * @param {Object} res 
  */
 exports.getOneSauce = (req, res) =>{
     Sauce.findOne({_id: req.params.id})
@@ -46,7 +45,7 @@ exports.getOneSauce = (req, res) =>{
 /**
  * Supprime la sauce d'id donné dans la requête
  * @param {*} req 
- * @param {*} res 
+ * @param {Object} res 
  */
 exports.deleteSauce = (req, res) =>{
     Sauce.findOne({_id: req.params.id})
@@ -64,7 +63,7 @@ exports.deleteSauce = (req, res) =>{
 /**
  * Modifie la sauce d'id passé dans la requête
  * @param {*} req 
- * @param {*} res 
+ * @param {Object} res 
  */
 exports.modifySauce = (req, res) =>{
     let sauceObjet = {};
@@ -89,6 +88,11 @@ exports.modifySauce = (req, res) =>{
         .catch(error => res.status(400).json({error}));
 };
 
+/**
+ * Ajoute ou supprime un like ou un dislike
+ * @param {Object} req 
+ * @param {Object} res 
+ */
 exports.likeSauce = (req, res) =>{
     Sauce.findOne({_id: req.params.id})
         .then(sauce =>{
@@ -139,10 +143,10 @@ exports.likeSauce = (req, res) =>{
         .catch(error => res.status(500).json({error}));
 };
 /**
- * 
+ * Ajoute un like et le userId aux likes et usersLiked de la sauce passée en paramètre
  * @param {object} sauce 
  * @param {string} userId 
- * @returns 
+ * @returns {object} 
  */
 exports.choiceLike = (sauce, userId) =>{
     console.log('fonction');
@@ -154,10 +158,10 @@ exports.choiceLike = (sauce, userId) =>{
 };
 
 /**
- * 
+ * Retire un like ou un dislike et le userId du tableau correspondant à la sauce passée en paramètre
  * @param {object} sauce 
  * @param {string} userId 
- * @returns 
+ * @returns {object}
  */
 exports.changeChoice = (sauce, userId) =>{
     let sauceUpdate = {};
@@ -170,7 +174,7 @@ exports.changeChoice = (sauce, userId) =>{
     };
     if(sauce.usersDisliked.includes(userId)){
         const index = sauce.usersDisliked.indexOf(userId);
-        sauce.usersDisliked.splice(index, 1);
+        sauce.usersDisliked.splice(index, 1); //Retire l'élément qui est à la position 'index' dans le tableau
         const newUsersDisliked = sauce.usersDisliked;
         const newDislikes = sauce.dislikes - 1;
         sauceUpdate = {usersDisliked: newUsersDisliked, dislikes: newDislikes};
@@ -179,10 +183,10 @@ exports.changeChoice = (sauce, userId) =>{
 };
 
 /**
- * 
+ * Ajoute un dislike et le userId aux dislikes et usersDisliked de la sauce passée en paramètre
  * @param {object} sauce 
  * @param {string} userId 
- * @returns 
+ * @returns {object}
  */
 exports.choiceDislike = (sauce, userId) =>{
     console.log('fonction');

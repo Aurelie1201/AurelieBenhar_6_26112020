@@ -2,9 +2,7 @@ const http = require('http');
 const app = require('./app');
 
 /**
- * Renvoi un port valide
- * qu'il soit fourni sous la forme
- * d'un numéro ou d'une chaîne
+ * Renvoi un port valide qu'il soit fourni sous la forme d'un numéro ou d'une chaîne
  * @param {*} val 
  * @returns port
  */
@@ -51,8 +49,7 @@ const errorHandler = error =>{
 const server = http.createServer(app);
 
 /**
- * consigne le port ou le canal nommé sur lequel
- * le serveur s'éxécute dans la console.
+ * consigne le port ou le canal nommé sur lequel le serveur s'éxécute dans la console.
  */
  server.on('error', errorHandler);
  server.on('listening', () =>{

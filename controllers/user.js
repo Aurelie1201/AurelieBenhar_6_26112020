@@ -8,7 +8,7 @@ const iv = CryptoJs.enc.Hex.parse(process.env.CRYPTO_IV);
 /**
  * Vérification d'un mail d'une apparence valide
  * @param {String} mail 
- * @returns Boolean
+ * @returns {Boolean}
  */
 const testMail = (mail) =>{
     let regMail = new RegExp ("^[0-9a-z._-]+@{1}[0-9a-z.-]{2,}[.]{1}[a-z]{2,5}");
@@ -20,7 +20,7 @@ const testMail = (mail) =>{
  * Vérification d'un mot de passe contenant au moins 8 caractères
  * et contenant des chiffres, des lettres et seulement ._- comme caractères spéciaux
  * @param {String} password 
- * @returns Boolean
+ * @returns {Boolean}
  */
 const testPassword = (password) =>{
     let regPassword = new RegExp ("^[0-9a-zA-Z._-]{8,}");
@@ -28,6 +28,11 @@ const testPassword = (password) =>{
     return regPassword.test(password);
 };
 
+/**
+ * Création d'un nouvel utilisateur
+ * @param {Object} req 
+ * @param {Object} res 
+ */
 exports.signup = (req, res) =>{
     if (!testMail(req.body.email)){
         res.status(400).json({message: "Adresse email non valide"});
@@ -50,6 +55,11 @@ exports.signup = (req, res) =>{
     }
 };
 
+/**
+ * Connexion d'un utilisateur en lui fournissant un jeton d'authentification
+ * @param {Object} req 
+ * @param {Object} res 
+ */
 exports.login = (req, res) =>{
     const cryptMail = CryptoJs.AES.encrypt(req.body.email, key, {iv: iv}).toString();
     console.log(cryptMail);

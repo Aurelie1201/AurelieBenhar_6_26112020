@@ -11,6 +11,7 @@ const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauces');
 const limiter = rateLimit({windowMs: 10*60*1000, max: 100}); //Le client pourra effectuer 100 requêtes toutes les 10 min
 
+//Connexion à la base de donnée mongodb
 mongoose.connect('mongodb+srv://'+process.env.DB_USER+':'+process.env.DB_PASSWORD+'@cluster0.ahins.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
